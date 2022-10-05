@@ -1,4 +1,4 @@
-package main
+package ggrep
 
 var (
 	Colors = map[string]string {
