@@ -1,18 +1,25 @@
 package ggrep
 
 import (
+	"os"
 	"bufio"
 	"regexp"
 	"strings"
 )
 
-func Find(text , pattern string) (string, err) {
+func Find(fileNames string, pattern string) (text string, err error) {
 	// This function should handle when input is from a
 	// file or stdin and pass the searching to find.
+	for _, f := range fileNames {
+		file := os.Open(f)
+		found, err := find(file, pattern)
+	}
+
+	return found, err
 }
 
-func find(file *File, pattern string) (string, err) {
-	matches := make([]string)
+func find(file *os.File, pattern string) (string, error) {
+	matches := []string{}
 	regex, err := regexp.Compile(pattern)
 
 	if err != nil {
@@ -20,11 +27,12 @@ func find(file *File, pattern string) (string, err) {
 	}
 
         line := bufio.NewScanner(file)
-	for l := line.Scan() {
-		oldText := l.Text()
+	for line.Scan() {
+		oldText := line.Text()
 		if regex.MatchString(oldText) {
-			newWord := strings.Join([]strings{Colors[Red], regex.FindString(pattern), Colors[Reset]}, "")
-			newText := regex.ReplaceAllString(oldText, newMatch)
+			newWord := []strings{Colors[Red], regex.FindString(pattern), Colors[Reset]}
+			replacement := strings.Join(newWord, "")
+			newText := regex.ReplaceAllString(oldText, replacement)
 			append(matches, newText)
 		} else {
 			append(matches, oldText)
