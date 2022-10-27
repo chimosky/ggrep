@@ -9,6 +9,18 @@ import (
 	"strings"
 )
 
+func FindStdIn(file *os.File, pattern string) {
+	matches, err := find(file, pattern)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for _, v := range matches {
+		fmt.Println(v)
+	}
+}
+
 func Find(fileNames []string, pattern string) {
 	// This function should handle when input is from a
 	// file or stdin and pass the searching to find.
