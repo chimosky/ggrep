@@ -9,6 +9,13 @@ import (
 	"strings"
 )
 
+var (
+        Colors = map[string]string {
+                "Reset" : "\033[0m",
+                "Red"   : "\033[31m",
+        }
+)
+
 func FindStdIn(file *os.File, pattern string) {
 	matches, err := find(file, pattern)
 
