@@ -28,21 +28,18 @@ func FindStdIn(file *os.File, pattern string) {
 	}
 }
 
-func Find(fileNames []string, pattern string) {
-	// This function should handle when input is from a
-	// file or stdin and pass the searching to find.
+func Find(f *os.File, pattern string) {
 	matches := map[string]string{}
-	for _, f := range fileNames {
-		file, err := os.Open(f)
-		if err != nil {
-			log.Fatal(err)
-		}
+	found, err := find(f, pattern)
 
-		found, err := find(file, pattern)
-		if err != nil {
-			log.Fatal(err)
-		}
-		matches[file.Name()] = found
+	if err != nil {
+		log.Fatal(err)
+	}
+	matches[f.Name()] = found
+
+	if len(matches[f.Name()]) == 0 {
+		fmt.Println("No matches found")
+		os.Exit(0)
 	}
 
 	for k, v := range matches {
@@ -56,7 +53,7 @@ func find(file *os.File, pattern string) (string, error) {
 	regex, err := regexp.Compile(pattern)
 
 	if err != nil {
-		return "", err
+		log.Fatal(err)
 	}
 
         line := bufio.NewScanner(file)
