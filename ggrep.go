@@ -3,26 +3,30 @@ package ggrep
 import (
 	"os"
 	"fmt"
+	"log"
 )
+
+const usage = "usage: ggrep <pattern> <filname>..."
 
 func main() {
 
-	fileNames := os.Args[2:]
-	pattern := os.Args[1]
-
-	if len(os.Args) <= 2 {
-		if os.Stdin != nil {
-			FindStdIn(os.Stdin, pattern)
-		} else {
-			usage()
-			os.Exit(1)
-		}
+	if len(os.Args) == 1 {
+		fmt.Println(usage)
+		os.Exit(1)
 	}
 
+	pattern := os.Args[1]
+	fileNames := os.Args[2:]
 
-	Find(fileNames, pattern)
-}
+	if len(fileNames) == 0 {
+		FindStdIn(pattern)
+	}
 
-func usage() {
-	fmt.Println("usage: ggrep <pattern> <filname>...")
+	for _, f := range fileNames {
+		file, err := os.Open(f)
+		if err != nil {
+			log.Fatal(err)
+		}
+		Find(file, pattern)
+	}
 }
