@@ -48,32 +48,20 @@ func Find(f *os.File, pattern string) {
 }
 
 func find(file *os.File, pattern string) (string, error) {
-	var matches []string
-	regex, err := regexp.Compile(pattern)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		oldText := scanner.Text()
-		if regex.MatchString(oldText) {
-			newWord := []string{Colors["Red"], regex.FindString(pattern), Colors["Reset"]}
-			replacement := strings.Join(newWord, "")
-			newText := regex.ReplaceAllString(oldText, replacement)
-			matches = append(matches, newText)
-			matches = append(matches, "\n")
-		} else {
-			continue
-		}
-	}
+	searchResults, err := searchLoop(scanner, pattern)
 
-	m := strings.Join(matches, "")
-	return m, nil
+	return searchResults, err
 }
 
 func findStdin(pattern string) (string, error) {
+	scanner := bufio.NewScanner(os.Stdin)
+	searchResults, err := searchLoop(scanner, pattern)
+
+	return searchResults, err
+}
+
+func searchLoop(scanner *bufio.Scanner, pattern string) (string, error) {
 	var matches []string
 	regex, err := regexp.Compile(pattern)
 
@@ -81,7 +69,7 @@ func findStdin(pattern string) (string, error) {
 		log.Fatal(err)
 	}
 
-	scanner := bufio.NewScanner(os.Stdin)
+
 	for scanner.Scan() {
 		oldText := scanner.Text()
 		if regex.MatchString(oldText) {
