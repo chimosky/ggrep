@@ -19,16 +19,25 @@ func main() {
 	fileNames := os.Args[2:]
 
 	if len(fileNames) == 0 {
-		FindStdIn(pattern)
-	}
+		matches := FindStdIn(pattern)
+		fmt.Println(matches)
+	} else {
+		match := map[string]string{}
+		for _, f := range fileNames {
+			file, err := os.Open(f)
+			defer file.Close()
 
-	for _, f := range fileNames {
-		file, err := os.Open(f)
-                defer file.Close()
+			if err != nil {
+				log.Fatal(err)
+			}
 
-		if err != nil {
-			log.Fatal(err)
+			matches := Find(file, pattern)
+			match[file.Name()] = matches[:len(matches)-1]
 		}
-		Find(file, pattern)
+
+		for k, v := range match {
+			fmt.Println(k)
+			fmt.Println(v)
+		}
 	}
 }

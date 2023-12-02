@@ -3,7 +3,6 @@ package main
 import (
 	"os"
 	"log"
-	"fmt"
 	"sync"
 	"bufio"
 	"regexp"
@@ -18,7 +17,7 @@ var (
 	match = make(chan string, 1024)
 )
 
-func FindStdIn(pattern string) {
+func FindStdIn(pattern string) string {
 	scanner := bufio.NewScanner(os.Stdin)
 	matches, err := find(pattern, scanner)
 
@@ -26,28 +25,18 @@ func FindStdIn(pattern string) {
 		log.Fatal(err)
 	}
 
-
-	fmt.Println(matches[:len(matches)-1])
+	return matches
 }
 
-func Find(f *os.File, pattern string) {
-	matches := map[string]string{}
+func Find(f *os.File, pattern string) string {
 	scanner := bufio.NewScanner(f)
-	found, err := find(pattern, scanner)
+	matches, err := find(pattern, scanner)
 
 	if err != nil {
 		log.Fatal(err)
 	}
-	matches[f.Name()] = found[:len(found)-1]
 
-	if len(matches[f.Name()]) == 0 {
-		os.Exit(0)
-	}
-
-	for k, v := range matches {
-		fmt.Println(k)
-		fmt.Println(v)
-	}
+	return matches
 }
 
 func find(pattern string, scanner *bufio.Scanner) (string, error) {
