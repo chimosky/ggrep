@@ -19,7 +19,8 @@ var (
 )
 
 func FindStdIn(pattern string) {
-	matches, err := findStdin(pattern)
+	scanner := bufio.NewScanner(os.Stdin)
+	matches, err := find(pattern, scanner)
 
 	if err != nil {
 		log.Fatal(err)
@@ -31,7 +32,8 @@ func FindStdIn(pattern string) {
 
 func Find(f *os.File, pattern string) {
 	matches := map[string]string{}
-	found, err := find(f, pattern)
+	scanner := bufio.NewScanner(f)
+	found, err := find(pattern, scanner)
 
 	if err != nil {
 		log.Fatal(err)
@@ -39,7 +41,6 @@ func Find(f *os.File, pattern string) {
 	matches[f.Name()] = found[:len(found)-1]
 
 	if len(matches[f.Name()]) == 0 {
-		fmt.Println("No matches found")
 		os.Exit(0)
 	}
 
@@ -49,30 +50,8 @@ func Find(f *os.File, pattern string) {
 	}
 }
 
-func find(file *os.File, pattern string) (string, error) {
+func find(pattern string, scanner *bufio.Scanner) (string, error) {
 	var matches []string
-	scanner := bufio.NewScanner(file)
-	var wg sync.WaitGroup
-
-	for scanner.Scan() {
-		wg.Add(1)
-		go searchLoop(scanner.Text(), pattern, &wg)
-	}
-	wg.Wait()
-        close(match)
-
-        for v := range match {
-		matches = append(matches, v)
-		matches = append(matches, "\n")
-	}
-
-	m := strings.Join(matches, "")
-	return m, nil
-}
-
-func findStdin(pattern string) (string, error) {
-	var matches []string
-	scanner := bufio.NewScanner(os.Stdin)
 	var wg sync.WaitGroup
 
 	for scanner.Scan() {
