@@ -1,20 +1,19 @@
 package main
 
 import (
-	"os"
-	"log"
-	"sync"
 	"bufio"
+	"log"
+	"os"
 	"regexp"
 	"strings"
+	"sync"
 )
 
 var (
-        Colors = map[string]string {
-                "Reset" : "\033[0m",
-                "Red"   : "\033[1;31m",
-        }
-	match = make(chan string, 1024)
+	Colors = map[string]string{
+		"Reset": "\033[0m",
+		"Red":   "\033[1;31m",
+	}
 )
 
 func FindStdIn(pattern string) string {
@@ -40,17 +39,18 @@ func Find(f *os.File, pattern string) string {
 }
 
 func find(pattern string, scanner *bufio.Scanner) (string, error) {
+	match := make(chan string, 1024)
 	var matches []string
 	var wg sync.WaitGroup
 
 	for scanner.Scan() {
 		wg.Add(1)
-		go searchLoop(scanner.Text(), pattern, &wg)
+		go searchLoop(scanner.Text(), pattern, match, &wg)
 	}
 	wg.Wait()
-        close(match)
+	close(match)
 
-        for v := range match {
+	for v := range match {
 		matches = append(matches, v)
 		matches = append(matches, "\n")
 	}
@@ -59,14 +59,13 @@ func find(pattern string, scanner *bufio.Scanner) (string, error) {
 	return m, nil
 }
 
-func searchLoop(searchPattern, pattern string, wg *sync.WaitGroup) {
+func searchLoop(searchPattern, pattern string, match chan string, wg *sync.WaitGroup) {
 	defer wg.Done()
 	regex, err := regexp.Compile(pattern)
 
 	if err != nil {
 		log.Fatal(err)
 	}
-
 
 	oldText := searchPattern
 	if regex.MatchString(oldText) {

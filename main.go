@@ -1,9 +1,9 @@
 package main
 
 import (
-	"os"
 	"fmt"
 	"log"
+	"os"
 )
 
 const usage = "usage: ggrep <pattern> <filname>..."
@@ -32,12 +32,21 @@ func main() {
 			}
 
 			matches := Find(file, pattern)
-			match[file.Name()] = matches[:len(matches)-1]
+
+			if len(fileNames) > 1 {
+				match[file.Name()] = matches[:len(matches)-1]
+			} else {
+				match[""] = matches[:len(matches)-1]
+			}
 		}
 
 		for k, v := range match {
-			fmt.Println(k)
-			fmt.Println(v)
+			if len(k) == 0 {
+				fmt.Println(v)
+			} else {
+				fmt.Println(k)
+				fmt.Println(v)
+			}
 		}
 	}
 }
