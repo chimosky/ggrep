@@ -4,7 +4,8 @@ on: [push]
 jobs:
   basic:
     runs-on: ubuntu-latest
-      steps:
-       - uses: actions/checkout@v4
-         run: go fmt
-         run: go test
+    steps:
+      - uses: actions/checkout@v4
+      - run: | 
+          go fmt
+          go test
