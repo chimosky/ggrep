@@ -1,0 +1,19 @@
+name: Delete weblate-sync after branch is merged.
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - closed
+
+jobs:
+  if_merged:
+    if: | 
+      github.event.pull_request.merged == true &&
+      github.head_ref == "weblate-sync"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete branch
+        uses: SvenBoxel/delete-merged-branch@main
+        env:
+          GH_TOKEN: ${{ github.token }}
