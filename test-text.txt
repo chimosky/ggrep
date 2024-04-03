@@ -13,5 +13,3 @@ Eget arcu dictum varius duis at consectetur.
 Risus quis varius quam quisque id diam vel.
 Ut tellus elementum sagittis test et leo duis ut diam.
 Pharetra vel turpis nunc eget lorem test sed.
-
-Test check
