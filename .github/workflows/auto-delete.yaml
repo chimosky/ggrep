@@ -8,9 +8,7 @@ on:
 
 jobs:
   if_merged:
-    if: | 
-      github.event.pull_request.merged == true &&
-      github.head_ref == "weblate-sync"
+    if: github.head_ref == 'weblate-sync' && github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
       - name: Delete branch
